@@ -18,7 +18,7 @@
 var WebSocketServer = require('../../lib/websocket').server;
 var express = require('express');
 
-var app = express.createServer();
+var app = express();
 
 app.configure(function() {
     app.use(express.static(__dirname + "/public"));
@@ -28,11 +28,16 @@ app.configure(function() {
 app.get('/', function(req, res) {
     res.render('index', { layout: false });
 });
-app.listen(8080);
-
+var server = app.listen(process.env.PORT);
+//server.on('upgrade', upgradeListener);
+//server.on('connection',connectionListener);
+server.on('request', requestListener);
+function requestListener(request, response) {    
+    console.log(request.headers);
+}
 
 var wsServer = new WebSocketServer({
-    httpServer: app,
+    httpServer: server,
     
     // Firefox 7 alpha has a bug that drops the
     // connection on large fragmented messages
